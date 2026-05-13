@@ -4,9 +4,9 @@ import { motion } from "motion/react";
 import { useLang, type Lang } from "@/lib/i18n/context";
 import { cn } from "@/lib/cn";
 
-const OPTIONS: { lang: Lang; flag: string; label: string }[] = [
-  { lang: "de", flag: "🇩🇪", label: "DE" },
-  { lang: "en", flag: "🇬🇧", label: "EN" },
+const OPTIONS: { lang: Lang; label: string }[] = [
+  { lang: "de", label: "DE" },
+  { lang: "en", label: "EN" },
 ];
 
 export function LanguageSwitcher() {
@@ -28,7 +28,7 @@ export function LanguageSwitcher() {
             aria-pressed={active}
             aria-label={opt.label}
             className={cn(
-              "relative flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors",
+              "relative cursor-pointer rounded-full px-3 py-1 text-xs font-semibold transition-colors",
               active ? "text-edeka-blue-deep" : "text-ink-faint hover:text-ink-soft",
             )}
           >
@@ -39,7 +39,6 @@ export function LanguageSwitcher() {
                 transition={{ type: "spring", stiffness: 400, damping: 30 }}
               />
             )}
-            <span className="relative z-10 text-sm leading-none">{opt.flag}</span>
             <span className="relative z-10 font-mono tracking-wide">{opt.label}</span>
           </motion.button>
         );
