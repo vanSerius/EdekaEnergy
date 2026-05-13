@@ -1,0 +1,180 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --edeka-yellow: #FFD500;
+    --edeka-yellow-soft: #FFF6CC;
+    --edeka-yellow-deep: #F4B400;
+    --edeka-blue: #003D8F;
+    --edeka-blue-deep: #001A4D;
+    --paper: #FFFFFF;
+    --paper-soft: #FAF9F5;
+    --ink: #0A0E1A;
+    --ink-soft: #3A4055;
+    --ink-faint: #8089A0;
+    --leaf: #1F9E63;
+    --ember: #D9531E;
+    --line: rgba(10, 14, 26, 0.10);
+    --line-strong: rgba(10, 14, 26, 0.18);
+
+    --font-display: "Bricolage Grotesque", ui-serif, serif;
+    --font-body: "Geist", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "Geist Mono", ui-monospace, monospace;
+    --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+  }
+
+  html, body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-feature-settings: "ss01", "cv02", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  ::selection {
+    background-color: var(--edeka-yellow);
+    color: var(--edeka-blue-deep);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--ink);
+    letter-spacing: -0.025em;
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum", "lnum", "ss01";
+  }
+
+  .serif-italic {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--edeka-blue);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+}
+
+@layer components {
+  /* Crisp solid white card — the new default */
+  .card {
+    position: relative;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    box-shadow:
+      0 1px 0 0 rgba(10, 14, 26, 0.04),
+      0 12px 30px -10px rgba(10, 14, 26, 0.10);
+  }
+
+  /* Soft cream card — used sparingly for contrast variation */
+  .card-soft {
+    position: relative;
+    background: var(--paper-soft);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+  }
+
+  /* THE SIGNATURE — solid EDEKA Yellow block, Pitch-style */
+  .block-yellow {
+    position: relative;
+    background: var(--edeka-yellow);
+    color: var(--edeka-blue-deep);
+    border-radius: 28px;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+      0 2px 0 0 rgba(244, 180, 0, 0.6),
+      0 22px 50px -20px rgba(244, 180, 0, 0.5);
+  }
+
+  /* Solid EDEKA Deep Navy block */
+  .block-navy {
+    position: relative;
+    background: var(--edeka-blue-deep);
+    color: var(--paper);
+    border-radius: 28px;
+    box-shadow:
+      inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
+      0 30px 70px -28px rgba(0, 26, 77, 0.55);
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+
+  .display-num {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.045em;
+    line-height: 0.85;
+  }
+
+  .vert-label {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  /* Yellow highlighter under inline text */
+  .highlight-yellow {
+    position: relative;
+    display: inline-block;
+    padding: 0 0.1em;
+  }
+  .highlight-yellow::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0.1em;
+    height: 0.45em;
+    background: var(--edeka-yellow);
+    transform: skewY(-2deg);
+    z-index: -1;
+  }
+}
+
+/* Respect reduced-motion: pause all SVG + CSS animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  svg animate {
+    dur: 0s !important;
+  }
+}
+
+/* Recharts overrides — high-contrast brand */
+.recharts-cartesian-axis-tick text {
+  fill: var(--ink-soft);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.recharts-default-tooltip {
+  background: var(--paper) !important;
+  border: 1px solid var(--line-strong) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 12px 40px -10px rgba(10, 14, 26, 0.25) !important;
+}

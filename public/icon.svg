@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="56" fill="#FFD500"/>
+  <path d="M148 36 L72 144 L116 144 L96 220 L184 108 L140 108 Z" fill="#003D8F"/>
+  <text x="128" y="246" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-weight="700" font-size="22" fill="#003D8F">EDEKA</text>
+</svg>

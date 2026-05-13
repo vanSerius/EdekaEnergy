@@ -1,0 +1,97 @@
+"use client";
+
+import { motion } from "motion/react";
+import { Lock } from "lucide-react";
+import { getAchievements } from "@/lib/mockData";
+import { cn } from "@/lib/cn";
+
+const RARITY_META = {
+  gemein:   { label: "Gemein",   color: "#8089A0", bg: "#F2F3F6" },
+  selten:   { label: "Selten",   color: "#003D8F", bg: "#DBEAFE" },
+  episch:   { label: "Episch",   color: "#001A4D", bg: "#C7D6F5" },
+  legendär: { label: "Legendär", color: "#D9531E", bg: "#FBE3D5" },
+} as const;
+
+export function AchievementGrid() {
+  const list = getAchievements();
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      {list.map((a, i) => {
+        const rarity = RARITY_META[a.rarity];
+        return (
+          <motion.div
+            key={a.id}
+            initial={{ opacity: 0, y: 8, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: i * 0.03, duration: 0.4 }}
+            className={cn(
+              "card relative overflow-hidden p-4 transition hover:shadow-card-lift",
+              !a.unlocked && "opacity-75",
+            )}
+          >
+            {a.unlocked && (
+              <div
+                className="pointer-events-none absolute -right-6 -top-6 h-20 w-20 rounded-full blur-2xl"
+                style={{ background: rarity.bg }}
+              />
+            )}
+            <div className="relative flex items-start justify-between">
+              <div
+                className={cn(
+                  "flex h-12 w-12 items-center justify-center rounded-2xl text-2xl",
+                  a.unlocked ? "bg-edeka-yellow" : "bg-paper-deep grayscale",
+                )}
+              >
+                {a.unlocked ? a.icon : <Lock className="h-4 w-4 text-ink-faint" />}
+              </div>
+              <span
+                className="pill"
+                style={{
+                  background: a.unlocked ? rarity.bg : "transparent",
+                  color: a.unlocked ? rarity.color : "#9AA2B3",
+                  border: a.unlocked ? "none" : "1px dashed #9AA2B3",
+                }}
+              >
+                {rarity.label}
+              </span>
+            </div>
+            <div
+              className={cn(
+                "relative mt-3 font-display text-sm font-semibold leading-tight",
+                a.unlocked ? "text-ink" : "text-ink-faint",
+              )}
+            >
+              {a.title}
+            </div>
+            <p
+              className={cn(
+                "relative mt-1 line-clamp-2 text-xs leading-snug",
+                a.unlocked ? "text-ink-soft" : "text-ink-faint",
+              )}
+            >
+              {a.description}
+            </p>
+
+            {a.unlocked ? (
+              <div className="relative mt-3 font-mono text-[9px] uppercase tracking-wider text-leaf">
+                ✓ Vor {a.unlockedDaysAgo} Tagen freigeschaltet
+              </div>
+            ) : (
+              <div className="relative mt-3">
+                <div className="font-mono text-[9px] uppercase tracking-wider text-ink-faint">
+                  Fortschritt {Math.round((a.progress ?? 0) * 100)} %
+                </div>
+                <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-line">
+                  <div
+                    className="h-full rounded-full bg-ink-faint"
+                    style={{ width: `${(a.progress ?? 0) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+}

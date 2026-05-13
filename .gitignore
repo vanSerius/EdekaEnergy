@@ -1,0 +1,17 @@
+node_modules
+.next
+out
+.env*.local
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+
+# Promo videos (large binary files)
+promo/
+
+# Claude Code local config (not needed by other contributors)
+.claude/
+
+# Python cache
+__pycache__/
+*.pyc

@@ -1,0 +1,27 @@
+{
+  "name": "EDEKA Energie & Nachhaltigkeit",
+  "short_name": "EDEKA Energie",
+  "description": "Sensor-Daten, Trends und Markt-Vergleich für die EDEKA-Märkte.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FBF8F1",
+  "theme_color": "#FFD500",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "business", "utilities"],
+  "lang": "de",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
