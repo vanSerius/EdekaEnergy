@@ -3,15 +3,17 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Sparkles, X } from "lucide-react";
+import { useT } from "@/lib/i18n/context";
 
 export function AchievementToast() {
+  const t = useT();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 900);
+    const t1 = setTimeout(() => setVisible(true), 900);
     const t2 = setTimeout(() => setVisible(false), 9500);
     return () => {
-      clearTimeout(t);
+      clearTimeout(t1);
       clearTimeout(t2);
     };
   }, []);
@@ -38,19 +40,19 @@ export function AchievementToast() {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-edeka-blue">
                 <Sparkles className="h-3 w-3" strokeWidth={2.4} />
-                Neues Achievement
+                {t.dashboard.achievement_label}
               </div>
               <div className="mt-0.5 font-display text-base font-semibold text-ink">
-                Top 10!
+                {t.dashboard.achievement_title}
               </div>
               <p className="text-xs leading-snug text-ink-soft">
-                Erstmals in den Top 10 der EDEKA-Bestenliste. Bleib dran!
+                {t.dashboard.achievement_desc}
               </p>
             </div>
             <button
               onClick={() => setVisible(false)}
               className="rounded-full p-1 text-ink-soft transition hover:bg-paper-soft hover:text-ink"
-              aria-label="Schließen"
+              aria-label={t.dashboard.achievement_close}
             >
               <X className="h-3.5 w-3.5" />
             </button>

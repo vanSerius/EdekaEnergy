@@ -4,11 +4,12 @@ import { motion } from "motion/react";
 import { getAreaBreakdown } from "@/lib/mockData";
 import { SENSOR_AREAS } from "@/types/energy";
 import { formatkWh, formatPercent } from "@/lib/formatters";
+import { useT } from "@/lib/i18n/context";
 
-// Strict on-brand palette: ink, navy, yellow, leaf, ember, soft gray
 const COLORS = ["#001A4D", "#FFD500", "#003D8F", "#1F9E63", "#D9531E", "#8089A0"];
 
 export function AreaBreakdown() {
+  const t = useT();
   const breakdown = getAreaBreakdown();
   const total = breakdown.reduce((s, b) => s + b.kWh, 0);
   const sorted = [...breakdown].sort((a, b) => b.kWh - a.kWh);
@@ -24,10 +25,10 @@ export function AreaBreakdown() {
       <div className="relative flex items-center justify-between">
         <div>
           <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-soft">
-            Heute nach Bereich
+            {t.dashboard.area_today}
           </div>
           <h3 className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-ink">
-            Wo geht <span className="serif-italic text-edeka-blue">der Saft</span> hin?
+            {t.dashboard.area_title_1} <span className="serif-italic text-edeka-blue">{t.dashboard.area_title_2}</span> {t.dashboard.area_title_3}
           </h3>
         </div>
         <div className="num font-mono text-xs text-ink-faint">
@@ -68,7 +69,9 @@ export function AreaBreakdown() {
                 className="h-2.5 w-2.5 shrink-0 rounded-full"
                 style={{ background: COLORS[i] }}
               />
-              <span className="flex-1 truncate text-sm font-medium text-ink">{meta.label}</span>
+              <span className="flex-1 truncate text-sm font-medium text-ink">
+                {t.areas[s.area] ?? meta.label}
+              </span>
               <span className="num font-mono text-xs text-ink-soft">
                 {formatkWh(s.kWh, { digits: 0 })}
               </span>

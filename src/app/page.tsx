@@ -10,8 +10,10 @@ import { InsightsCard } from "@/components/dashboard/InsightsCard";
 import { AchievementToast } from "@/components/dashboard/AchievementToast";
 import { getCurrentMarketSnapshot } from "@/lib/mockData";
 import { formatkWh, formatEuro, formatKg } from "@/lib/formatters";
+import { useT } from "@/lib/i18n/context";
 
 export default function DashboardPage() {
+  const t = useT();
   const m = getCurrentMarketSnapshot();
 
   const dayDelta =
@@ -36,43 +38,43 @@ export default function DashboardPage() {
 
       <div className="flex items-end justify-between gap-3">
         <h3 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-          Die <span className="serif-italic text-edeka-blue">Zahlen</span>, kurz & knackig.
+          {t.dashboard.numbers_title} <span className="serif-italic text-edeka-blue">{t.dashboard.numbers_italic}</span>{t.dashboard.numbers_suffix}
         </h3>
         <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-ink-faint">
-          letzte 30 Tage
+          {t.dashboard.section_label}
         </span>
       </div>
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
         <KpiCard
-          label="Heute"
+          label={t.dashboard.kpi_today}
           value={formatkWh(m.kpis.todayKWh, { digits: 0, unit: false })}
-          unit="kWh"
-          delta={{ value: dayDelta, label: "vs. gestern", positiveIsLower: true }}
+          unit={t.dashboard.unit_kwh_day}
+          delta={{ value: dayDelta, label: t.dashboard.delta_yesterday, positiveIsLower: true }}
           icon={Zap}
           delay={0.02}
         />
         <KpiCard
-          label="Diese Woche"
+          label={t.dashboard.kpi_week}
           value={formatkWh(m.kpis.weekKWh / 1000, { digits: 2, unit: false })}
-          unit="MWh"
-          delta={{ value: weekDelta, label: "vs. Vorwoche", positiveIsLower: true }}
+          unit={t.dashboard.unit_mwh}
+          delta={{ value: weekDelta, label: t.dashboard.delta_last_week, positiveIsLower: true }}
           icon={CalendarRange}
           delay={0.08}
         />
         <KpiCard
-          label="CO₂ gespart"
+          label={t.dashboard.kpi_co2}
           value={formatKg(m.kpis.co2SavedKg, { digits: 0, unit: false })}
-          unit="kg / 30 T."
-          delta={{ value: 12.4, label: "vs. Markt-Schnitt", positiveIsLower: false }}
+          unit={t.dashboard.unit_kg}
+          delta={{ value: 12.4, label: t.dashboard.delta_market_avg, positiveIsLower: false }}
           icon={Cloud}
           delay={0.14}
         />
         <KpiCard
-          label="Eingespart"
+          label={t.dashboard.kpi_saved}
           value={formatEuro(m.kpis.costSavedEuro).replace(" €", "")}
-          unit="€ / 30 T."
-          delta={{ value: monthDelta, label: "Monatstrend", positiveIsLower: true }}
+          unit={t.dashboard.unit_euro}
+          delta={{ value: monthDelta, label: t.dashboard.delta_month_trend, positiveIsLower: true }}
           icon={Coins}
           tone="blue"
           delay={0.2}

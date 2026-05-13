@@ -3,8 +3,10 @@
 import { motion } from "motion/react";
 import { Flame } from "lucide-react";
 import { getCurrentMarketSnapshot } from "@/lib/mockData";
+import { useT } from "@/lib/i18n/context";
 
 export function StreakBadge() {
+  const t = useT();
   const m = getCurrentMarketSnapshot();
   return (
     <motion.div
@@ -17,7 +19,7 @@ export function StreakBadge() {
       <div className="relative flex items-center gap-2">
         <Flame className="h-3.5 w-3.5 text-ember" strokeWidth={2.6} fill="currentColor" />
         <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-soft">
-          Aktive Serie
+          {t.streak.label}
         </span>
       </div>
 
@@ -25,11 +27,11 @@ export function StreakBadge() {
         <span className="display-num text-[80px] leading-[0.8] text-ink">
           {m.streakDays}
         </span>
-        <span className="pb-3 font-serif text-xl italic text-ink-soft">Tage in Folge</span>
+        <span className="pb-3 font-serif text-xl italic text-ink-soft">{t.streak.days}</span>
       </div>
 
       <p className="relative mt-2 text-sm text-ink-soft">
-        unter dem Vergleichs-Schnitt deiner Region — <span className="font-serif italic text-ink">stark.</span>
+        {t.streak.subtitle} <span className="font-serif italic text-ink">{t.streak.subtitle_italic}</span>
       </p>
 
       <div className="relative mt-5 flex gap-0.5">
@@ -47,8 +49,8 @@ export function StreakBadge() {
         })}
       </div>
       <div className="relative mt-1.5 flex justify-between font-mono text-[10px] uppercase tracking-wider text-ink-faint">
-        <span>vor 2 Wo.</span>
-        <span>heute</span>
+        <span>{t.streak.two_weeks_ago}</span>
+        <span>{t.streak.today}</span>
       </div>
     </motion.div>
   );

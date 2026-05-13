@@ -4,20 +4,28 @@ import { motion } from "motion/react";
 import { Lock } from "lucide-react";
 import { getAchievements } from "@/lib/mockData";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/context";
 
-const RARITY_META = {
-  gemein:   { label: "Gemein",   color: "#8089A0", bg: "#F2F3F6" },
-  selten:   { label: "Selten",   color: "#003D8F", bg: "#DBEAFE" },
-  episch:   { label: "Episch",   color: "#001A4D", bg: "#C7D6F5" },
-  legendär: { label: "Legendär", color: "#D9531E", bg: "#FBE3D5" },
-} as const;
+const RARITY_COLORS: Record<string, { color: string; bg: string }> = {
+  gemein:   { color: "#8089A0", bg: "#F2F3F6" },
+  selten:   { color: "#003D8F", bg: "#DBEAFE" },
+  episch:   { color: "#001A4D", bg: "#C7D6F5" },
+  legendär: { color: "#D9531E", bg: "#FBE3D5" },
+};
 
 export function AchievementGrid() {
+  const t = useT();
   const list = getAchievements();
+
+  const rarityLabel = (r: string): string =>
+    (t.leaderboard as Record<string, string>)[`rarity_${r}`] ?? r;
+
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
       {list.map((a, i) => {
-        const rarity = RARITY_META[a.rarity];
+        const rarity = RARITY_COLORS[a.rarity] ?? RARITY_COLORS["gemein"];
+        const title = t.achievements[`${a.id}_title`] ?? a.title;
+        const desc = t.achievements[`${a.id}_desc`] ?? a.description;
         return (
           <motion.div
             key={a.id}
@@ -52,7 +60,7 @@ export function AchievementGrid() {
                   border: a.unlocked ? "none" : "1px dashed #9AA2B3",
                 }}
               >
-                {rarity.label}
+                {rarityLabel(a.rarity)}
               </span>
             </div>
             <div
@@ -61,7 +69,7 @@ export function AchievementGrid() {
                 a.unlocked ? "text-ink" : "text-ink-faint",
               )}
             >
-              {a.title}
+              {title}
             </div>
             <p
               className={cn(
@@ -69,17 +77,17 @@ export function AchievementGrid() {
                 a.unlocked ? "text-ink-soft" : "text-ink-faint",
               )}
             >
-              {a.description}
+              {desc}
             </p>
 
             {a.unlocked ? (
               <div className="relative mt-3 font-mono text-[9px] uppercase tracking-wider text-leaf">
-                ✓ Vor {a.unlockedDaysAgo} Tagen freigeschaltet
+                ✓ {t.leaderboard.unlocked_prefix}{t.leaderboard.unlocked_prefix ? " " : ""}{a.unlockedDaysAgo} {t.leaderboard.unlocked_ago}
               </div>
             ) : (
               <div className="relative mt-3">
                 <div className="font-mono text-[9px] uppercase tracking-wider text-ink-faint">
-                  Fortschritt {Math.round((a.progress ?? 0) * 100)} %
+                  {t.leaderboard.progress} {Math.round((a.progress ?? 0) * 100)} %
                 </div>
                 <div className="mt-1 h-1 w-full overflow-hidden rounded-full bg-line">
                   <div

@@ -5,8 +5,11 @@ import { ArrowDownRight, ArrowUpRight, Zap } from "lucide-react";
 import { SparkLine } from "@/components/charts/SparkLine";
 import { formatPercent, formatRelativeMinutes } from "@/lib/formatters";
 import { getCurrentMarketSnapshot, getReadings, DEMO_NOW } from "@/lib/mockData";
+import { useT, useLang } from "@/lib/i18n/context";
 
 export function EnergyHero() {
+  const t = useT();
+  const { lang } = useLang();
   const market = getCurrentMarketSnapshot();
   const todayReadings = getReadings({ range: "day" });
   const values = todayReadings.slice(0, DEMO_NOW.getHours() + 1).map(r => r.kWh);
@@ -15,6 +18,8 @@ export function EnergyHero() {
     ((market.kpis.todayKWh - market.kpis.yesterdayKWh) / market.kpis.yesterdayKWh) * 100;
   const lower = delta < 0;
   const TrendIcon = lower ? ArrowDownRight : ArrowUpRight;
+
+  const relMinutes = formatRelativeMinutes(market.updatedAtMinutesAgo, t.shell.updated);
 
   return (
     <motion.section
@@ -36,11 +41,11 @@ export function EnergyHero() {
             <span className="relative h-2 w-2 rounded-full bg-edeka-blue-deep" />
           </span>
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-edeka-blue-deep">
-            Live · {DEMO_NOW.toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" })}
+            {t.hero.live_prefix} · {DEMO_NOW.toLocaleDateString(lang === "en" ? "en-GB" : "de-DE", { weekday: "long", day: "numeric", month: "long" })}
           </span>
         </div>
         <div className="hidden sm:block font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-edeka-blue-deep/70">
-          {formatRelativeMinutes(market.updatedAtMinutesAgo)} · {market.kpis.currentLoadKw.toFixed(1)} kW
+          {relMinutes} · {market.kpis.currentLoadKw.toFixed(1)} kW
         </div>
       </motion.div>
 
@@ -52,11 +57,11 @@ export function EnergyHero() {
         className="relative mt-6"
       >
         <h2 className="font-display text-2xl font-semibold leading-[1.05] tracking-tight text-edeka-blue-deep sm:text-3xl lg:text-4xl">
-          Dein Verbrauch <span className="serif-italic">heute</span> bisher.
+          {t.hero.headline_1} <span className="serif-italic">{t.hero.headline_2}</span> {t.hero.headline_3}
         </h2>
       </motion.div>
 
-      {/* MASSIVE NUMBER — deep navy on yellow, max contrast */}
+      {/* MASSIVE NUMBER */}
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -83,12 +88,12 @@ export function EnergyHero() {
           >
             <TrendIcon className="h-4 w-4" strokeWidth={2.6} />
             <span className="num">{formatPercent(delta, { signed: true })}</span>
-            <span className="text-paper/70">vs. gestern</span>
+            <span className="text-paper/70">{t.hero.vs_yesterday}</span>
           </motion.div>
           <div className="flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-edeka-blue-deep">
             <Zap className="h-3 w-3" strokeWidth={2.6} fill="currentColor" />
             <span className="num">{market.kpis.currentLoadKw.toFixed(1)} kW</span>
-            <span className="opacity-70">aktuell</span>
+            <span className="opacity-70">{t.hero.current}</span>
           </div>
         </div>
       </motion.div>
@@ -112,7 +117,7 @@ export function EnergyHero() {
           <span>06 · 00</span>
           <span>12 · 00</span>
           <span>18 · 00</span>
-          <span className="text-edeka-blue-deep">JETZT</span>
+          <span className="text-edeka-blue-deep">{t.hero.now}</span>
         </div>
       </motion.div>
     </motion.section>

@@ -3,15 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { NAV_ITEMS } from "./nav-items";
+import { Gauge, LineChart, Trophy } from "lucide-react";
+import { useT } from "@/lib/i18n/context";
 
 export function BottomNav() {
+  const t = useT();
   const pathname = usePathname();
+
+  const NAV = [
+    { href: "/", shortLabel: t.nav.dashboard_short, icon: Gauge },
+    { href: "/verlauf", shortLabel: t.nav.history_short, icon: LineChart },
+    { href: "/bestenliste", shortLabel: t.nav.leaderboard_short, icon: Trophy },
+  ];
+
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 lg:hidden">
       <div className="pointer-events-none mx-auto flex max-w-md justify-center px-3 pb-3 pt-2">
         <div className="pointer-events-auto flex w-full items-stretch gap-1 rounded-full border border-line bg-paper p-1.5 shadow-card-lift">
-          {NAV_ITEMS.map(item => {
+          {NAV.map(item => {
             const active = pathname === item.href;
             const Icon = item.icon;
             return (

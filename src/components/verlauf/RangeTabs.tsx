@@ -2,15 +2,9 @@
 
 import { motion } from "motion/react";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/context";
 
 export type Range = "day" | "week" | "month" | "year";
-
-const TABS: { id: Range; label: string }[] = [
-  { id: "day", label: "Tag" },
-  { id: "week", label: "Woche" },
-  { id: "month", label: "Monat" },
-  { id: "year", label: "Jahr" },
-];
 
 export function RangeTabs({
   value,
@@ -19,14 +13,23 @@ export function RangeTabs({
   value: Range;
   onChange: (r: Range) => void;
 }) {
+  const t = useT();
+
+  const TABS: { id: Range; label: string }[] = [
+    { id: "day", label: t.history.range_day },
+    { id: "week", label: t.history.range_week },
+    { id: "month", label: t.history.range_month },
+    { id: "year", label: t.history.range_year },
+  ];
+
   return (
     <div className="inline-flex rounded-full border border-line bg-paper p-1 shadow-card">
-      {TABS.map(t => {
-        const active = t.id === value;
+      {TABS.map(tab => {
+        const active = tab.id === value;
         return (
           <button
-            key={t.id}
-            onClick={() => onChange(t.id)}
+            key={tab.id}
+            onClick={() => onChange(tab.id)}
             className={cn(
               "relative cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition",
               active ? "text-edeka-blue-deep" : "text-ink-soft hover:text-ink",
@@ -39,7 +42,7 @@ export function RangeTabs({
                 transition={{ type: "spring", stiffness: 380, damping: 32 }}
               />
             )}
-            <span className="relative z-10">{t.label}</span>
+            <span className="relative z-10">{tab.label}</span>
           </button>
         );
       })}

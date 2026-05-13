@@ -3,16 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { ChevronRight } from "lucide-react";
-import { NAV_ITEMS } from "./nav-items";
+import { ChevronRight, Gauge, LineChart, Trophy } from "lucide-react";
 import { EdekaMark } from "@/components/brand/EdekaMark";
 import { getCurrentMarketSnapshot } from "@/lib/mockData";
 import { REGION_META } from "@/types/energy";
+import { useT } from "@/lib/i18n/context";
 
 export function Sidebar() {
+  const t = useT();
   const pathname = usePathname();
   const market = getCurrentMarketSnapshot();
   const region = REGION_META[market.region];
+
+  const NAV = [
+    { href: "/", label: t.nav.dashboard_label, icon: Gauge },
+    { href: "/verlauf", label: t.nav.history_label, icon: LineChart },
+    { href: "/bestenliste", label: t.nav.leaderboard_label, icon: Trophy },
+  ];
 
   return (
     <aside className="fixed left-0 top-0 z-30 hidden h-dvh w-[260px] flex-col border-r border-line bg-paper lg:flex">
@@ -20,20 +27,20 @@ export function Sidebar() {
         <EdekaMark size={28} />
         <div className="flex flex-col leading-tight">
           <span className="font-display text-[15px] font-semibold tracking-tight text-ink">
-            Energie
+            {t.shell.app_title}
           </span>
           <span className="font-mono text-[9px] uppercase tracking-[0.22em] text-ink-soft">
-            & Nachhaltigkeit
+            {t.shell.app_subtitle}
           </span>
         </div>
       </div>
 
       <div className="mt-10 px-3">
         <p className="px-3 pb-3 font-mono text-[9px] uppercase tracking-[0.26em] text-ink-faint">
-          Navigation
+          {t.shell.nav_section}
         </p>
         <ul className="flex flex-col gap-1.5">
-          {NAV_ITEMS.map(item => {
+          {NAV.map(item => {
             const active = pathname === item.href;
             const Icon = item.icon;
             return (
@@ -69,7 +76,7 @@ export function Sidebar() {
         <div className="card overflow-hidden p-4">
           <div className="flex items-start justify-between">
             <div className="font-mono text-[9px] uppercase tracking-[0.26em] text-ink-faint">
-              Markt
+              {t.shell.market_section}
             </div>
             <div className="flex items-center gap-1 rounded-full bg-leaf-soft px-2 py-0.5">
               <span className="relative flex h-1.5 w-1.5">
@@ -77,7 +84,7 @@ export function Sidebar() {
                 <span className="relative h-1.5 w-1.5 rounded-full bg-leaf" />
               </span>
               <span className="font-mono text-[9px] uppercase tracking-wider text-leaf">
-                Live
+                {t.shell.live}
               </span>
             </div>
           </div>
@@ -94,7 +101,7 @@ export function Sidebar() {
             </span>
           </div>
           <button className="mt-3 flex w-full items-center justify-between rounded-xl border border-line bg-paper-soft px-3 py-2 text-xs font-medium text-ink-soft transition hover:bg-paper hover:text-ink">
-            Markt wechseln
+            {t.shell.switch_market}
             <ChevronRight className="h-3.5 w-3.5" />
           </button>
         </div>

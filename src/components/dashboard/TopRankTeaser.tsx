@@ -5,8 +5,10 @@ import { motion } from "motion/react";
 import { ArrowRight, Trophy } from "lucide-react";
 import { getCurrentMarketSnapshot } from "@/lib/mockData";
 import { LEAGUE_META } from "@/types/energy";
+import { useT } from "@/lib/i18n/context";
 
 export function TopRankTeaser() {
+  const t = useT();
   const m = getCurrentMarketSnapshot();
   const league = LEAGUE_META[m.league];
   const movedUp = m.rankLastWeek - m.rank;
@@ -31,37 +33,37 @@ export function TopRankTeaser() {
         <div className="relative flex items-center gap-2">
           <Trophy className="h-3.5 w-3.5 text-edeka-yellow" strokeWidth={2.4} />
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-edeka-yellow">
-            {league.label}
+            {t.leagues[m.league]}
           </span>
         </div>
 
         <div className="relative mt-7">
           <div className="font-mono text-[10px] uppercase tracking-[0.24em] text-paper/55">
-            Dein Markt belegt aktuell
+            {t.rank_teaser.current}
           </div>
           <div className="mt-2 flex items-end gap-3">
             <span className="display-num text-[88px] leading-[0.8] text-edeka-yellow sm:text-[100px]">
               #{m.rank}
             </span>
             <span className="pb-3 font-serif text-xl italic text-paper/75">
-              von {m.totalMarkets}
+              {t.rank_teaser.of} {m.totalMarkets}
             </span>
           </div>
         </div>
 
         <div className="relative mt-5 flex flex-wrap items-center gap-2">
           {movedUp > 0 ? (
-            <span className="pill bg-leaf text-paper">▲ {movedUp} Ränge diese Woche</span>
+            <span className="pill bg-leaf text-paper">▲ {movedUp} {t.rank_teaser.weeks_up}</span>
           ) : movedUp < 0 ? (
             <span className="pill bg-ember text-paper">▼ {Math.abs(movedUp)}</span>
           ) : (
-            <span className="pill bg-white/15 text-paper">stabil</span>
+            <span className="pill bg-white/15 text-paper">{t.rank_teaser.stable}</span>
           )}
-          <span className="pill bg-white/10 text-paper/70">noch 2 für Platinliga</span>
+          <span className="pill bg-white/10 text-paper/70">{t.rank_teaser.to_platinum}</span>
         </div>
 
         <div className="relative mt-7 flex items-center justify-between border-t border-white/10 pt-5 text-sm font-medium">
-          <span className="font-serif text-lg italic text-paper">Zur Bestenliste</span>
+          <span className="font-serif text-lg italic text-paper">{t.rank_teaser.to_leaderboard}</span>
           <motion.span
             className="flex h-8 w-8 items-center justify-center rounded-full bg-edeka-yellow text-edeka-blue-deep"
             whileHover={{ scale: 1.1, rotate: 12 }}

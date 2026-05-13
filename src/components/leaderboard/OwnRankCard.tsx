@@ -5,8 +5,10 @@ import { ArrowUp, ArrowDown, Flame, Sparkles } from "lucide-react";
 import { getCurrentMarketSnapshot, getOwnEntry } from "@/lib/mockData";
 import { LeagueBadge } from "./LeagueBadge";
 import { LEAGUE_META } from "@/types/energy";
+import { useT } from "@/lib/i18n/context";
 
 export function OwnRankCard() {
+  const t = useT();
   const market = getCurrentMarketSnapshot();
   const entry = getOwnEntry();
   const league = LEAGUE_META[market.league];
@@ -24,20 +26,20 @@ export function OwnRankCard() {
           <div className="flex items-center gap-2.5">
             <Sparkles className="h-3.5 w-3.5 text-edeka-blue-deep" strokeWidth={2.4} />
             <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-edeka-blue-deep">
-              Dein Markt · {league.label}
+              {t.leaderboard.your_market} · {t.leagues[market.league]}
             </span>
           </div>
           <h1 className="font-display text-4xl font-semibold leading-[1.05] tracking-tight text-edeka-blue-deep sm:text-5xl lg:text-6xl">
-            Du bist auf{" "}
+            {t.leaderboard.own_market_prefix}{" "}
             <span className="relative inline-block whitespace-nowrap">
               <span
                 aria-hidden
                 className="absolute inset-x-0 bottom-1 h-3 -skew-y-1 rounded bg-edeka-blue-deep/15 lg:h-4"
               />
-              <span className="relative">Platz {market.rank}</span>
+              <span className="relative">{t.leaderboard.place} {market.rank}</span>
             </span>
             <br />
-            <span className="serif-italic">von {market.totalMarkets}</span>.
+            <span className="serif-italic">{t.leaderboard.of} {market.totalMarkets}</span>.
           </h1>
           <p className="max-w-md text-sm font-medium text-edeka-blue-deep/80 sm:text-base">
             {entry.kWhPerSqm.toFixed(1)} kWh / m² · {market.squareMeters} m² · {market.displayName.split(" · ")[1]}
@@ -47,25 +49,25 @@ export function OwnRankCard() {
             {movedUp > 0 ? (
               <span className="pill bg-edeka-blue-deep px-3 py-1.5 text-paper">
                 <ArrowUp className="h-3.5 w-3.5" />
-                {movedUp} Ränge diese Woche
+                {movedUp} {t.leaderboard.weeks_up}
               </span>
             ) : (
               <span className="pill bg-ember px-3 py-1.5 text-paper">
                 <ArrowDown className="h-3.5 w-3.5" />
-                {Math.abs(movedUp)} Ränge
+                {Math.abs(movedUp)} {t.leaderboard.ranks_down}
               </span>
             )}
             <span className="pill bg-edeka-blue-deep/10 px-3 py-1.5 text-edeka-blue-deep">
               <Flame className="h-3.5 w-3.5" strokeWidth={2.4} fill="currentColor" />
-              {market.streakDays}-Tage-Serie
+              {market.streakDays}{t.leaderboard.streak_series}
             </span>
           </div>
 
           {league.next && (
             <div className="mt-5 max-w-md">
               <div className="flex justify-between font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-edeka-blue-deep">
-                <span>Aufstieg in {LEAGUE_META[league.next].label}</span>
-                <span className="num">{market.rank - 2} von 25 Rängen frei</span>
+                <span>{t.leaderboard.promotion_to} {t.leagues[league.next]}</span>
+                <span className="num">{market.rank - 2} {t.leaderboard.promotion_of}</span>
               </div>
               <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-edeka-blue-deep/15">
                 <motion.div

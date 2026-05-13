@@ -10,8 +10,11 @@ import { HeatmapChart } from "@/components/charts/HeatmapChart";
 import { getReadings, getHeatmap, DEMO_NOW } from "@/lib/mockData";
 import { weekdayShort, formatkWh, formatPercent, monthShort } from "@/lib/formatters";
 import type { SensorArea } from "@/types/energy";
+import { useT, useLang } from "@/lib/i18n/context";
 
 export default function VerlaufPage() {
+  const t = useT();
+  const { lang } = useLang();
   const [range, setRange] = useState<Range>("week");
   const [areas, setAreas] = useState<SensorArea[]>([]);
 
@@ -30,17 +33,17 @@ export default function VerlaufPage() {
         range === "day"
           ? `${String(labelDate.getHours()).padStart(2, "0")} Uhr`
           : range === "week"
-          ? weekdayShort(labelDate)
+          ? weekdayShort(labelDate, lang)
           : range === "month"
           ? `${labelDate.getDate()}.`
-          : monthShort(labelDate);
+          : monthShort(labelDate, lang);
       return {
         label,
         current: p.kWh,
         previous: previous[i]?.kWh,
       };
     });
-  }, [range, areas]);
+  }, [range, areas, lang]);
 
   const totals = useMemo(() => {
     const sumCurrent = data.reduce((s, p) => s + p.current, 0);
@@ -53,6 +56,13 @@ export default function VerlaufPage() {
 
   const heatmap = useMemo(() => getHeatmap(), []);
 
+  const rangeLabelMap: Record<Range, string> = {
+    day: t.history.range_label_day,
+    week: t.history.range_label_week,
+    month: t.history.range_label_month,
+    year: t.history.range_label_year,
+  };
+
   return (
     <div className="space-y-8 lg:space-y-10">
       <motion.header
@@ -64,10 +74,10 @@ export default function VerlaufPage() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-faint">
-              Verlauf · Detail-Analyse
+              {t.history.breadcrumb}
             </div>
             <h1 className="mt-2 font-display text-4xl font-semibold leading-[1.05] tracking-tight text-ink sm:text-5xl lg:text-6xl">
-              Wie verteilt sich <br /><span className="serif-italic text-edeka-blue">der Verbrauch</span>?
+              {t.history.title_1} <br /><span className="serif-italic text-edeka-blue">{t.history.title_2}</span>{t.history.title_3}
             </h1>
           </div>
           <RangeTabs value={range} onChange={setRange} />
@@ -92,7 +102,7 @@ export default function VerlaufPage() {
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-soft">
-              Σ Gesamt {rangeLabel(range)}
+              {t.history.total_label} {rangeLabelMap[range]}
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-3">
               <span className="display-num text-edeka-blue-deep text-[64px] leading-[0.85] sm:text-[88px] lg:text-[112px]">
@@ -118,8 +128,8 @@ export default function VerlaufPage() {
             </div>
           </div>
           <div className="flex flex-col gap-1.5 text-right">
-            <Legend swatch="#001A4D" label="Aktuell" />
-            <Legend swatch="#8089A0" label="Vorperiode" dashed />
+            <Legend swatch="#001A4D" label={t.history.legend_current} />
+            <Legend swatch="#8089A0" label={t.history.legend_prev} dashed />
           </div>
         </div>
 
@@ -128,12 +138,12 @@ export default function VerlaufPage() {
         </div>
 
         <div className="relative mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label="Spitze" value={`${totals.peak.label} · ${formatkWh(totals.peak.current, { digits: 0 })}`} />
-          <Stat label="Tief" value={`${totals.trough.label} · ${formatkWh(totals.trough.current, { digits: 0 })}`} />
-          <Stat label="Vorperiode" value={formatkWh(totals.sumPrev, { digits: 0 })} />
+          <Stat label={t.history.stat_peak} value={`${totals.peak?.label ?? ""} · ${formatkWh(totals.peak?.current ?? 0, { digits: 0 })}`} />
+          <Stat label={t.history.stat_trough} value={`${totals.trough?.label ?? ""} · ${formatkWh(totals.trough?.current ?? 0, { digits: 0 })}`} />
+          <Stat label={t.history.stat_prev} value={formatkWh(totals.sumPrev, { digits: 0 })} />
           <Stat
-            label="Trend"
-            value={`${totals.delta < 0 ? "Sparen" : "Mehrverbrauch"}`}
+            label={t.history.stat_trend}
+            value={totals.delta < 0 ? t.history.trend_saving : t.history.trend_over}
             tone={totals.delta < 0 ? "leaf" : "ember"}
           />
         </div>
@@ -143,10 +153,10 @@ export default function VerlaufPage() {
         <div className="relative mb-6 flex items-end justify-between">
           <div>
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-soft">
-              Heatmap · 6 Wochen
+              {t.history.heatmap_label}
             </div>
             <h2 className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-              Wann läuft die <span className="serif-italic text-edeka-blue">Hütte heiß</span>?
+              {t.history.heatmap_title_1} <span className="serif-italic text-edeka-blue">{t.history.heatmap_title_2}</span>{t.history.heatmap_title_3}
             </h2>
           </div>
         </div>
@@ -159,30 +169,26 @@ export default function VerlaufPage() {
         <div className="relative flex items-center gap-2">
           <TrendingDown className="h-4 w-4 text-leaf" />
           <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-soft">
-            Was uns auffällt
+            {t.history.insights_label}
           </span>
         </div>
         <ul className="relative mt-4 space-y-3 text-sm text-ink">
           <li>
-            <span className="font-semibold text-edeka-blue">Backstation:</span> Mi & Sa morgens 6–8 Uhr
-            erzeugen ca. 18 % des Tagesverbrauchs. Lastentzerrung prüfen?
+            <span className="font-semibold text-edeka-blue">{t.history.insight_1_area}</span>{" "}
+            {t.history.insight_1}
           </li>
           <li>
-            <span className="font-semibold text-edeka-blue">Klima:</span> Nachmittagspitzen 14–17 Uhr
-            seit Wechsel auf neue Schaltzeiten um <span className="num font-semibold">-9 %</span>.
+            <span className="font-semibold text-edeka-blue">{t.history.insight_2_area}</span>{" "}
+            {t.history.insight_2}
           </li>
           <li>
-            <span className="font-semibold text-edeka-blue">Nachtwerte:</span> Sonntags ab 22 Uhr läuft die
-            Eingangsbeleuchtung 30 % über Schnitt — Sensor 3B checken.
+            <span className="font-semibold text-edeka-blue">{t.history.insight_3_area}</span>{" "}
+            {t.history.insight_3}
           </li>
         </ul>
       </section>
     </div>
   );
-}
-
-function rangeLabel(r: Range): string {
-  return { day: "Heute", week: "diese Woche", month: "letzte 30 T.", year: "letzte 12 Mo." }[r];
 }
 
 function Legend({ swatch, label, dashed }: { swatch: string; label: string; dashed?: boolean }) {

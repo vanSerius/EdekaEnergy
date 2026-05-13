@@ -8,15 +8,22 @@ import { AchievementGrid } from "@/components/leaderboard/AchievementGrid";
 import { getLeaderboard } from "@/lib/mockData";
 import { REGION_META, type MarketSize, type Region } from "@/types/energy";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/context";
 
 type RegionFilter = Region | "all";
 type SizeFilter = MarketSize | "all";
 
 export default function BestenlistePage() {
+  const t = useT();
   const [region, setRegion] = useState<RegionFilter>("all");
   const [size, setSize] = useState<SizeFilter>("all");
 
   const entries = useMemo(() => getLeaderboard({ region, size, limit: 12 }), [region, size]);
+
+  const regionLabel =
+    region === "all"
+      ? t.leaderboard.nationwide
+      : (t.regions[region as Region] ?? REGION_META[region as Region].label);
 
   return (
     <div className="space-y-8 lg:space-y-10">
@@ -26,35 +33,39 @@ export default function BestenlistePage() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-faint">
-              Bestenliste · Anonym, fair, motivierend
+              {t.leaderboard.breadcrumb}
             </div>
             <h2 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight text-ink sm:text-4xl">
-              Top 12 <span className="serif-italic text-edeka-blue">
-                · {region === "all" ? "deutschlandweit" : REGION_META[region as Region].label}
+              {t.leaderboard.title_prefix} <span className="serif-italic text-edeka-blue">
+                · {regionLabel}
               </span>
             </h2>
             <p className="mt-1 text-sm text-ink-soft">
-              Vergleich nach kWh pro m². Andere Märkte sind anonymisiert.
+              {t.leaderboard.subtitle}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <FilterGroup label="Region">
+            <FilterGroup label={t.leaderboard.filter_region}>
               {(["all", "nord", "sued", "ost", "west", "mitte"] as RegionFilter[]).map(r => (
                 <FilterChip
                   key={r}
                   active={region === r}
                   onClick={() => setRegion(r)}
-                  label={r === "all" ? "Alle" : REGION_META[r as Region].short}
+                  label={
+                    r === "all"
+                      ? t.leaderboard.filter_all
+                      : (t.regions[`${r}_short`] ?? REGION_META[r as Region].short)
+                  }
                 />
               ))}
             </FilterGroup>
-            <FilterGroup label="Größe">
+            <FilterGroup label={t.leaderboard.filter_size}>
               {(["all", "S", "M", "L", "XL"] as SizeFilter[]).map(s => (
                 <FilterChip
                   key={s}
                   active={size === s}
                   onClick={() => setSize(s)}
-                  label={s === "all" ? "Alle" : s}
+                  label={s === "all" ? t.leaderboard.filter_all : s}
                 />
               ))}
             </FilterGroup>
@@ -74,10 +85,10 @@ export default function BestenlistePage() {
       <section className="space-y-5">
         <div>
           <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-faint">
-            Achievements · Trophäenkabinett
+            {t.leaderboard.achievements_label}
           </div>
           <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-            Was du <span className="serif-italic text-edeka-blue">erreicht</span> hast.
+            {t.leaderboard.achievements_title_1} <span className="serif-italic text-edeka-blue">{t.leaderboard.achievements_title_2}</span> {t.leaderboard.achievements_title_3}
           </h2>
         </div>
         <AchievementGrid />

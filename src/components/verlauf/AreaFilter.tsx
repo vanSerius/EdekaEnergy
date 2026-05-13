@@ -3,6 +3,7 @@
 import { motion } from "motion/react";
 import { SENSOR_AREAS, type SensorArea } from "@/types/energy";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/context";
 
 export function AreaFilter({
   selected,
@@ -13,6 +14,8 @@ export function AreaFilter({
   onToggle: (a: SensorArea) => void;
   onReset: () => void;
 }) {
+  const t = useT();
+
   return (
     <div className="flex flex-wrap items-center gap-2">
       <button
@@ -24,7 +27,7 @@ export function AreaFilter({
             : "border border-line bg-paper text-ink-soft hover:bg-paper-soft hover:text-ink",
         )}
       >
-        Alle Bereiche
+        {t.history.areas_all}
       </button>
       {SENSOR_AREAS.map(a => {
         const active = selected.includes(a.id);
@@ -41,7 +44,7 @@ export function AreaFilter({
             )}
           >
             <span className="text-sm leading-none">{a.emoji}</span>
-            {a.label}
+            {t.areas[a.id] ?? a.label}
           </motion.button>
         );
       })}

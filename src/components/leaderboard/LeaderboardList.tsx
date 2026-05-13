@@ -4,22 +4,27 @@ import { motion } from "motion/react";
 import { ArrowUp, ArrowDown, Minus } from "lucide-react";
 import { type LeaderboardEntry, LEAGUE_META, REGION_META } from "@/types/energy";
 import { cn } from "@/lib/cn";
+import { useT } from "@/lib/i18n/context";
 
 export function LeaderboardList({ entries }: { entries: LeaderboardEntry[] }) {
+  const t = useT();
+
   return (
     <div className="flex flex-col gap-2">
       <div className="hidden grid-cols-12 gap-2 px-5 font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-ink-faint sm:grid">
-        <span className="col-span-1">#</span>
-        <span className="col-span-4">Markt</span>
-        <span className="col-span-2">Region</span>
-        <span className="col-span-2">Größe</span>
-        <span className="col-span-2 text-right">kWh / m²</span>
-        <span className="col-span-1 text-right">Δ</span>
+        <span className="col-span-1">{t.leaderboard.col_hash}</span>
+        <span className="col-span-4">{t.leaderboard.col_market}</span>
+        <span className="col-span-2">{t.leaderboard.col_region}</span>
+        <span className="col-span-2">{t.leaderboard.col_size}</span>
+        <span className="col-span-2 text-right">{t.leaderboard.col_kwh}</span>
+        <span className="col-span-1 text-right">{t.leaderboard.col_delta}</span>
       </div>
       {entries.map((e, i) => {
         const league = LEAGUE_META[e.league];
         const isFirst = e.rank === 1;
         const isTop3 = e.rank <= 3;
+        const regionLabel = t.regions[e.region] ?? REGION_META[e.region].label;
+        const displayName = e.isOwn ? t.leaderboard.your_market : e.anonName;
         return (
           <motion.div
             key={e.marketId}
@@ -67,17 +72,17 @@ export function LeaderboardList({ entries }: { entries: LeaderboardEntry[] }) {
                   e.isOwn ? "text-edeka-blue-deep" : isFirst ? "text-edeka-blue-deep" : "text-ink",
                 )}
               >
-                {e.anonName}
+                {displayName}
               </span>
               {e.isOwn && (
-                <span className="pill bg-edeka-blue-deep text-paper">Du</span>
+                <span className="pill bg-edeka-blue-deep text-paper">{t.leaderboard.you}</span>
               )}
               {isFirst && !e.isOwn && (
                 <span className="pill bg-edeka-yellow text-edeka-blue-deep">🥇</span>
               )}
             </div>
             <div className={cn("col-span-3 hidden text-sm sm:col-span-2 sm:block", e.isOwn ? "text-edeka-blue-deep/80" : "text-ink-soft")}>
-              {REGION_META[e.region].label}
+              {regionLabel}
             </div>
             <div className={cn("col-span-3 hidden text-sm sm:col-span-2 sm:block", e.isOwn ? "text-edeka-blue-deep/80" : "text-ink-soft")}>
               {e.size}
