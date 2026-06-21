@@ -18,7 +18,19 @@ export interface ChartPoint {
   previous?: number;
 }
 
-export function ConsumptionAreaChart({ data, height = 320 }: { data: ChartPoint[]; height?: number }) {
+export function ConsumptionAreaChart({
+  data,
+  height = 320,
+  formatTick,
+  formatTooltip,
+}: {
+  data: ChartPoint[];
+  height?: number;
+  formatTick?: (v: number) => string;
+  formatTooltip?: (v: number) => string;
+}) {
+  const tickFmt = formatTick ?? ((v: number) => `${Math.round(v)}`);
+  const tipFmt = formatTooltip ?? ((v: number) => formatkWh(v, { digits: 0 }));
   return (
     <ResponsiveContainer width="100%" height={height}>
       <ComposedChart data={data} margin={{ top: 12, right: 16, bottom: 0, left: 0 }}>
@@ -41,10 +53,10 @@ export function ConsumptionAreaChart({ data, height = 320 }: { data: ChartPoint[
           tickLine={false}
           axisLine={false}
           width={40}
-          tickFormatter={v => `${Math.round(v)}`}
+          tickFormatter={tickFmt}
         />
         <Tooltip
-          formatter={(v: number, name: string) => [formatkWh(v, { digits: 0 }), name === "current" ? "Aktuell" : "Vorperiode"]}
+          formatter={(v: number, name: string) => [tipFmt(v), name === "current" ? "Aktuell" : "Vorperiode"]}
           labelFormatter={l => `${l}`}
         />
         <Area

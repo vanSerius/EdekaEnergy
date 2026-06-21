@@ -11,9 +11,11 @@ import { AchievementToast } from "@/components/dashboard/AchievementToast";
 import { getCurrentMarketSnapshot } from "@/lib/mockData";
 import { formatkWh, formatEuro, formatKg } from "@/lib/formatters";
 import { useT } from "@/lib/i18n/context";
+import { useUnit } from "@/lib/units/context";
 
 export default function DashboardPage() {
   const t = useT();
+  const { isIntensity, format, unitLabel } = useUnit();
   const m = getCurrentMarketSnapshot();
 
   const dayDelta =
@@ -48,16 +50,24 @@ export default function DashboardPage() {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
         <KpiCard
           label={t.dashboard.kpi_today}
-          value={formatkWh(m.kpis.todayKWh, { digits: 0, unit: false })}
-          unit={t.dashboard.unit_kwh_day}
+          value={
+            isIntensity
+              ? format(m.kpis.todayKWh, { digits: 2, unit: false })
+              : formatkWh(m.kpis.todayKWh, { digits: 0, unit: false })
+          }
+          unit={isIntensity ? unitLabel : t.dashboard.unit_kwh_day}
           delta={{ value: dayDelta, label: t.dashboard.delta_yesterday, positiveIsLower: true }}
           icon={Zap}
           delay={0.02}
         />
         <KpiCard
           label={t.dashboard.kpi_week}
-          value={formatkWh(m.kpis.weekKWh / 1000, { digits: 2, unit: false })}
-          unit={t.dashboard.unit_mwh}
+          value={
+            isIntensity
+              ? format(m.kpis.weekKWh, { digits: 1, unit: false })
+              : formatkWh(m.kpis.weekKWh / 1000, { digits: 2, unit: false })
+          }
+          unit={isIntensity ? unitLabel : t.dashboard.unit_mwh}
           delta={{ value: weekDelta, label: t.dashboard.delta_last_week, positiveIsLower: true }}
           icon={CalendarRange}
           delay={0.08}

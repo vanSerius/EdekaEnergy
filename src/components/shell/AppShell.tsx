@@ -2,10 +2,12 @@ import { Sidebar } from "./Sidebar";
 import { BottomNav } from "./BottomNav";
 import { TopBar } from "./TopBar";
 import { LanguageProvider } from "@/lib/i18n/context";
+import { UnitProvider } from "@/lib/units/context";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <LanguageProvider>
+      <UnitProvider>
       <div className="relative min-h-dvh bg-paper">
         <div className="relative z-10 flex min-h-dvh">
           <Sidebar />
@@ -21,6 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <BottomNav />
       </div>
+      </UnitProvider>
     </LanguageProvider>
   );
 }

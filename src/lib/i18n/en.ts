@@ -22,6 +22,13 @@ export const en: Translations = {
     notifications: "Notifications",
     tips: "Tips",
   },
+  units: {
+    switch_label: "Unit",
+    total_hint: "Total consumption in kilowatt-hours",
+    intensity_hint: "Consumption per m² of floor area — fair comparison across all store sizes",
+    basis_total: "Total consumption",
+    basis_intensity: "per m² of floor area",
+  },
   hero: {
     live_prefix: "Live",
     headline_1: "Your consumption",
