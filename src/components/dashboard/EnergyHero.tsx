@@ -76,11 +76,11 @@ export function EnergyHero() {
         transition={{ delay: 0.4, duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
         className="relative mt-4 flex flex-wrap items-end gap-x-6 gap-y-4"
       >
-        <div className="relative">
+        <div className="flex items-end gap-2 sm:gap-3">
           <span className="display-num block text-edeka-blue-deep text-[120px] leading-[0.85] sm:text-[180px] lg:text-[240px]">
             {heroDisplay}
           </span>
-          <span className="absolute -right-1 bottom-3 font-mono text-xs font-bold uppercase tracking-[0.3em] text-edeka-blue-deep/70">
+          <span className="whitespace-nowrap pb-3 font-mono text-xs font-bold uppercase tracking-[0.3em] text-edeka-blue-deep/70 sm:pb-5 lg:pb-7">
             {unitLabel}
           </span>
         </div>
