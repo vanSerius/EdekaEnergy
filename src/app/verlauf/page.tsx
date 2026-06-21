@@ -8,13 +8,15 @@ import { AreaFilter } from "@/components/verlauf/AreaFilter";
 import { ConsumptionAreaChart, type ChartPoint } from "@/components/charts/ConsumptionAreaChart";
 import { HeatmapChart } from "@/components/charts/HeatmapChart";
 import { getReadings, getHeatmap, DEMO_NOW } from "@/lib/mockData";
-import { weekdayShort, formatkWh, formatPercent, monthShort } from "@/lib/formatters";
+import { weekdayShort, formatkWh, formatIntensity, formatPercent, monthShort } from "@/lib/formatters";
 import type { SensorArea } from "@/types/energy";
 import { useT, useLang } from "@/lib/i18n/context";
+import { useUnit } from "@/lib/units/context";
 
 export default function VerlaufPage() {
   const t = useT();
   const { lang } = useLang();
+  const { isIntensity, convert, unitLabel } = useUnit();
   const [range, setRange] = useState<Range>("week");
   const [areas, setAreas] = useState<SensorArea[]>([]);
 
@@ -37,13 +39,14 @@ export default function VerlaufPage() {
           : range === "month"
           ? `${labelDate.getDate()}.`
           : monthShort(labelDate, lang);
+      const prev = previous[i]?.kWh;
       return {
         label,
-        current: p.kWh,
-        previous: previous[i]?.kWh,
+        current: convert(p.kWh),
+        previous: prev === undefined ? undefined : convert(prev),
       };
     });
-  }, [range, areas, lang]);
+  }, [range, areas, lang, isIntensity, convert]);
 
   const totals = useMemo(() => {
     const sumCurrent = data.reduce((s, p) => s + p.current, 0);
@@ -55,6 +58,14 @@ export default function VerlaufPage() {
   }, [data]);
 
   const heatmap = useMemo(() => getHeatmap(), []);
+
+  // Werte aus `data`/`totals` liegen bereits in der aktiven Einheit vor
+  // (kWh oder kWh/m²) — hier nur noch passend formatieren.
+  const fmtVal = (v: number, digits: number) =>
+    isIntensity ? formatIntensity(v, { digits }) : formatkWh(v, { digits });
+
+  const showMwh = !isIntensity && range === "year";
+  const headlineNumber = showMwh ? totals.sumCurrent / 1000 : totals.sumCurrent;
 
   const rangeLabelMap: Record<Range, string> = {
     day: t.history.range_label_day,
@@ -102,16 +113,16 @@ export default function VerlaufPage() {
         <div className="relative flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-soft">
-              {t.history.total_label} {rangeLabelMap[range]}
+              {t.history.total_label} {rangeLabelMap[range]} · {isIntensity ? t.units.basis_intensity : t.units.basis_total}
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-3">
               <span className="display-num text-edeka-blue-deep text-[64px] leading-[0.85] sm:text-[88px] lg:text-[112px]">
-                {(totals.sumCurrent / (range === "year" ? 1000 : 1)).toLocaleString("de-DE", {
-                  maximumFractionDigits: range === "day" ? 0 : 1,
+                {headlineNumber.toLocaleString("de-DE", {
+                  maximumFractionDigits: range === "day" ? (isIntensity ? 2 : 0) : 1,
                 })}
               </span>
               <span className="font-mono text-base font-medium text-ink-soft">
-                {range === "year" ? "MWh" : "kWh"}
+                {showMwh ? "MWh" : unitLabel}
               </span>
               <span
                 className={`pill px-3 py-1.5 text-sm font-semibold ${
@@ -134,13 +145,21 @@ export default function VerlaufPage() {
         </div>
 
         <div className="relative mt-8">
-          <ConsumptionAreaChart data={data} />
+          <ConsumptionAreaChart
+            data={data}
+            formatTick={v =>
+              isIntensity
+                ? v.toLocaleString("de-DE", { maximumFractionDigits: 2 })
+                : `${Math.round(v)}`
+            }
+            formatTooltip={v => fmtVal(v, isIntensity ? 2 : 0)}
+          />
         </div>
 
         <div className="relative mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Stat label={t.history.stat_peak} value={`${totals.peak?.label ?? ""} · ${formatkWh(totals.peak?.current ?? 0, { digits: 0 })}`} />
-          <Stat label={t.history.stat_trough} value={`${totals.trough?.label ?? ""} · ${formatkWh(totals.trough?.current ?? 0, { digits: 0 })}`} />
-          <Stat label={t.history.stat_prev} value={formatkWh(totals.sumPrev, { digits: 0 })} />
+          <Stat label={t.history.stat_peak} value={`${totals.peak?.label ?? ""} · ${fmtVal(totals.peak?.current ?? 0, isIntensity ? 2 : 0)}`} />
+          <Stat label={t.history.stat_trough} value={`${totals.trough?.label ?? ""} · ${fmtVal(totals.trough?.current ?? 0, isIntensity ? 2 : 0)}`} />
+          <Stat label={t.history.stat_prev} value={fmtVal(totals.sumPrev, isIntensity ? 1 : 0)} />
           <Stat
             label={t.history.stat_trend}
             value={totals.delta < 0 ? t.history.trend_saving : t.history.trend_over}

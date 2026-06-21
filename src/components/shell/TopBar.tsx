@@ -9,6 +9,7 @@ import { formatRelativeMinutes } from "@/lib/formatters";
 import { cn } from "@/lib/cn";
 import { useT } from "@/lib/i18n/context";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { UnitSwitcher } from "./UnitSwitcher";
 
 export function TopBar() {
   const t = useT();
@@ -68,6 +69,7 @@ export function TopBar() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          <UnitSwitcher />
           <LanguageSwitcher />
           <motion.button
             whileTap={{ scale: 0.92 }}

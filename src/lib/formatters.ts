@@ -7,6 +7,18 @@ export function formatkWh(value: number, opts: { digits?: number; unit?: boolean
   return opts.unit === false ? formatted : `${formatted} kWh`;
 }
 
+export function formatIntensity(
+  value: number,
+  opts: { digits?: number; unit?: boolean } = {},
+): string {
+  const digits = opts.digits ?? (value >= 10 ? 1 : 2);
+  const formatted = value.toLocaleString("de-DE", {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  });
+  return opts.unit === false ? formatted : `${formatted} kWh/m²`;
+}
+
 export function formatKg(value: number, opts: { digits?: number; unit?: boolean } = {}): string {
   const digits = opts.digits ?? (value >= 100 ? 0 : 1);
   const formatted = value.toLocaleString("de-DE", {

@@ -3,13 +3,15 @@
 import { motion } from "motion/react";
 import { getAreaBreakdown } from "@/lib/mockData";
 import { SENSOR_AREAS } from "@/types/energy";
-import { formatkWh, formatPercent } from "@/lib/formatters";
+import { formatPercent } from "@/lib/formatters";
 import { useT } from "@/lib/i18n/context";
+import { useUnit } from "@/lib/units/context";
 
 const COLORS = ["#001A4D", "#FFD500", "#003D8F", "#1F9E63", "#D9531E", "#8089A0"];
 
 export function AreaBreakdown() {
   const t = useT();
+  const { isIntensity, format } = useUnit();
   const breakdown = getAreaBreakdown();
   const total = breakdown.reduce((s, b) => s + b.kWh, 0);
   const sorted = [...breakdown].sort((a, b) => b.kWh - a.kWh);
@@ -32,7 +34,7 @@ export function AreaBreakdown() {
           </h3>
         </div>
         <div className="num font-mono text-xs text-ink-faint">
-          Σ {formatkWh(total, { digits: 0 })}
+          Σ {format(total, { digits: isIntensity ? 2 : 0 })}
         </div>
       </div>
 
@@ -73,7 +75,7 @@ export function AreaBreakdown() {
                 {t.areas[s.area] ?? meta.label}
               </span>
               <span className="num font-mono text-xs text-ink-soft">
-                {formatkWh(s.kWh, { digits: 0 })}
+                {format(s.kWh, { digits: isIntensity ? 2 : 0 })}
               </span>
               <span className="num w-16 text-right font-display text-base font-semibold text-ink">
                 {formatPercent(pct, { digits: 0 })}

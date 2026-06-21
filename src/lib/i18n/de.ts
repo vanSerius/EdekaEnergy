@@ -20,6 +20,13 @@ export const de = {
     notifications: "Benachrichtigungen",
     tips: "Tipps",
   },
+  units: {
+    switch_label: "Einheit",
+    total_hint: "Gesamtverbrauch in Kilowattstunden",
+    intensity_hint: "Verbrauch pro m² Verkaufsfläche — fairer Vergleich über alle Marktgrößen",
+    basis_total: "Gesamtverbrauch",
+    basis_intensity: "pro m² Verkaufsfläche",
+  },
   hero: {
     live_prefix: "Live",
     headline_1: "Dein Verbrauch",

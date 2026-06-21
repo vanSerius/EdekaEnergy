@@ -14,6 +14,10 @@ import {
 const SEED = "edeka-energie-2026";
 const rng = seedrandom(SEED);
 
+// Verkaufsfläche des eigenen Markts in m² — zentrale Quelle für die
+// Umrechnung von kWh in kWh/m² (Energieintensität, fairer Markt-Vergleich).
+export const OWN_MARKET_SQM = 1240;
+
 function rand(min: number, max: number): number {
   return min + rng() * (max - min);
 }
@@ -262,7 +266,7 @@ export function getCurrentMarketSnapshot(): MarketSnapshot {
     displayName: "EDEKA Wagner · Hamburg-Eppendorf",
     region: "nord",
     size: "M",
-    squareMeters: 1240,
+    squareMeters: OWN_MARKET_SQM,
     league: "gold",
     rank: 7,
     totalMarkets: 247,

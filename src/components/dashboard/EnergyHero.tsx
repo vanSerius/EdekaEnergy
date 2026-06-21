@@ -6,13 +6,21 @@ import { SparkLine } from "@/components/charts/SparkLine";
 import { formatPercent, formatRelativeMinutes } from "@/lib/formatters";
 import { getCurrentMarketSnapshot, getReadings, DEMO_NOW } from "@/lib/mockData";
 import { useT, useLang } from "@/lib/i18n/context";
+import { useUnit } from "@/lib/units/context";
 
 export function EnergyHero() {
   const t = useT();
   const { lang } = useLang();
+  const { isIntensity, convert, unitLabel } = useUnit();
   const market = getCurrentMarketSnapshot();
   const todayReadings = getReadings({ range: "day" });
   const values = todayReadings.slice(0, DEMO_NOW.getHours() + 1).map(r => r.kWh);
+
+  const heroValue = convert(market.kpis.todayKWh);
+  const heroDisplay = heroValue.toLocaleString("de-DE", {
+    minimumFractionDigits: isIntensity ? 2 : 0,
+    maximumFractionDigits: isIntensity ? 2 : 0,
+  });
 
   const delta =
     ((market.kpis.todayKWh - market.kpis.yesterdayKWh) / market.kpis.yesterdayKWh) * 100;
@@ -70,10 +78,10 @@ export function EnergyHero() {
       >
         <div className="relative">
           <span className="display-num block text-edeka-blue-deep text-[120px] leading-[0.85] sm:text-[180px] lg:text-[240px]">
-            {market.kpis.todayKWh.toLocaleString("de-DE", { maximumFractionDigits: 0 })}
+            {heroDisplay}
           </span>
           <span className="absolute -right-1 bottom-3 font-mono text-xs font-bold uppercase tracking-[0.3em] text-edeka-blue-deep/70">
-            kWh
+            {unitLabel}
           </span>
         </div>
 
