@@ -16,7 +16,7 @@ export function Sidebar() {
   const region = REGION_META[market.region];
 
   const NAV = [
-    { href: "/", label: t.nav.dashboard_label, icon: Gauge },
+    { href: "/dashboard", label: t.nav.dashboard_label, icon: Gauge },
     { href: "/verlauf", label: t.nav.history_label, icon: LineChart },
     { href: "/bestenliste", label: t.nav.leaderboard_label, icon: Trophy },
   ];

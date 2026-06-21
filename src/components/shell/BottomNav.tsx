@@ -11,7 +11,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   const NAV = [
-    { href: "/", shortLabel: t.nav.dashboard_short, icon: Gauge },
+    { href: "/dashboard", shortLabel: t.nav.dashboard_short, icon: Gauge },
     { href: "/verlauf", shortLabel: t.nav.history_short, icon: LineChart },
     { href: "/bestenliste", shortLabel: t.nav.leaderboard_short, icon: Trophy },
   ];

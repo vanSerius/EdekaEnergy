@@ -9,7 +9,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/", label: "Dashboard", shortLabel: "Heute", icon: Gauge },
+  { href: "/dashboard", label: "Dashboard", shortLabel: "Heute", icon: Gauge },
   { href: "/verlauf", label: "Verlauf", shortLabel: "Verlauf", icon: LineChart },
   { href: "/bestenliste", label: "Bestenliste", shortLabel: "Liga", icon: Trophy },
 ];
