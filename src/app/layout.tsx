@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
-import { AppShell } from "@/components/shell/AppShell";
+import { LanguageProvider } from "@/lib/i18n/context";
+import { UnitProvider } from "@/lib/units/context";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({
@@ -54,7 +55,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="de" className={`${display.variable} ${body.variable} ${mono.variable} ${serif.variable}`}>
       <body>
-        <AppShell>{children}</AppShell>
+        <LanguageProvider>
+          <UnitProvider>{children}</UnitProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
