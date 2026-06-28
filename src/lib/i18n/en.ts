@@ -48,7 +48,7 @@ export const en: Translations = {
     v1_screen_title: "Your energy overview",
     v09_tag: "Version 0.9 · Manager pilot",
     v09_title: "The control room",
-    v09_desc: "Manager view for the client: every store at a glance. Pick a store on the left and its figures appear just like in version 1 — including the kWh/m² toggle for a fair comparison.",
+    v09_desc: "Manager view: every store and its consumption at a glance. Pick a store on the left — including the kWh/m² toggle for a fair comparison.",
     v09_cta: "Open version 0.9",
     v09_screen_eyebrow: "Version 0.9 · Manager view",
     v09_screen_title: "Every store at a glance",

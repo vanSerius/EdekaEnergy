@@ -46,7 +46,7 @@ export const de = {
     v1_screen_title: "Dein Energie-Überblick",
     v09_tag: "Version 0.9 · Manager-Pilot",
     v09_title: "Die Zentrale",
-    v09_desc: "Manager-Ansicht für den Auftraggeber: alle Märkte auf einen Blick. Links den Markt wählen, die Werte erscheinen wie in Version 1 — inkl. kWh/m²-Umschalter für den fairen Vergleich.",
+    v09_desc: "Manager-Ansicht: alle Märkte und ihr Verbrauch auf einen Blick. Links den Markt wählen — inkl. kWh/m²-Umschalter für den fairen Vergleich.",
     v09_cta: "Version 0.9 öffnen",
     v09_screen_eyebrow: "Version 0.9 · Manager-Ansicht",
     v09_screen_title: "Alle Märkte im Blick",
