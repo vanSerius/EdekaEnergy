@@ -79,7 +79,7 @@ export function AdminScreen({ onBack }: { onBack: () => void }) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               >
-                <OverviewSections />
+                <OverviewSections variant="v09" />
               </motion.div>
             </div>
           </div>

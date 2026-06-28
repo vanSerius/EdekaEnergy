@@ -18,7 +18,14 @@ import { useStore } from "@/lib/store/context";
  * Bereichs-Filter, Gesamtsumme, Flächen-Chart und Eckwerte. Wird im
  * V1-Überblick als kompakter "Verlauf in einer Karte" eingesetzt.
  */
-export function ConsumptionExplorer() {
+export function ConsumptionExplorer({
+  title,
+  hideBreadcrumb = false,
+}: {
+  /** Überschrift überschreiben (z. B. "Verbrauch" in der Manager-Ansicht). */
+  title?: string;
+  hideBreadcrumb?: boolean;
+} = {}) {
   const t = useT();
   const { lang } = useLang();
   const { isIntensity, convert, unitLabel } = useUnit();
@@ -80,11 +87,19 @@ export function ConsumptionExplorer() {
     <section className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-faint">
-            {t.history.breadcrumb}
-          </div>
+          {!hideBreadcrumb && (
+            <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.28em] text-ink-faint">
+              {t.history.breadcrumb}
+            </div>
+          )}
           <h3 className="mt-1.5 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-            {t.history.title_1} <span className="serif-italic text-edeka-blue">{t.history.title_2}</span>{t.history.title_3}
+            {title ? (
+              title
+            ) : (
+              <>
+                {t.history.title_1} <span className="serif-italic text-edeka-blue">{t.history.title_2}</span>{t.history.title_3}
+              </>
+            )}
           </h3>
         </div>
         <RangeTabs value={range} onChange={setRange} />

@@ -56,6 +56,8 @@ export const en: Translations = {
   admin: {
     stores_label: "Stores",
     own_tag: "Your store",
+    rank_label: "Store rank",
+    consumption_title: "Consumption",
   },
   hero: {
     live_prefix: "Live",

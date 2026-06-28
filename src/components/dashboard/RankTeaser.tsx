@@ -10,11 +10,13 @@ import { useStore } from "@/lib/store/context";
 
 /**
  * Kompakter Rang-Hinweis für den V1-Überblick (und V0.9):
- * "Dein Markt belegt aktuell #7 von 247" — inkl. Liga, Wochen-Veränderung
- * und kWh/m² als Vergleichsbasis. Bewusst NICHT verlinkt, da V1/V0.9 keine
- * eigene Bestenliste haben.
+ * "Dein Markt belegt aktuell #7 von 247" — Wochen-Veränderung und kWh/m² als
+ * Vergleichsbasis. Bewusst NICHT verlinkt, da V1/V0.9 keine eigene
+ * Bestenliste haben.
+ *
+ * showLeague=false (V0.9): Liga-Namen ausblenden, nur der reine Rang zählt.
  */
-export function RankTeaser() {
+export function RankTeaser({ showLeague = true }: { showLeague?: boolean } = {}) {
   const t = useT();
   const { activeStore } = useStore();
   const m = getCurrentMarketSnapshot(activeStore);
@@ -45,7 +47,7 @@ export function RankTeaser() {
           </span>
           <div className="leading-tight">
             <div className="font-mono text-[10px] font-semibold uppercase tracking-[0.24em] text-edeka-yellow">
-              {t.leagues[m.league]}
+              {showLeague ? t.leagues[m.league] : t.admin.rank_label}
             </div>
             <div className="mt-1 text-sm text-paper/70">
               {t.rank_teaser.current}{" "}
@@ -80,7 +82,7 @@ export function RankTeaser() {
           </span>
         </div>
 
-        {activeStore.isOwn && league.next && (
+        {showLeague && activeStore.isOwn && league.next && (
           <span className="ml-auto hidden font-serif text-sm italic text-paper/65 sm:inline">
             {t.rank_teaser.to_platinum}
           </span>

@@ -54,6 +54,8 @@ export const de = {
   admin: {
     stores_label: "Märkte",
     own_tag: "Dein Markt",
+    rank_label: "Markt-Rang",
+    consumption_title: "Verbrauch",
   },
   hero: {
     live_prefix: "Live",
