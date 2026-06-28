@@ -89,7 +89,172 @@ function weekdayMultiplier(date: Date): number {
 
 const BASELINE_KW = 38; // average load in kW for a mid-size EDEKA
 
-function consumptionAt(date: Date, area: SensorArea): number {
+/**
+ * Profil eines einzelnen EDEKA-Markts. Jeder Markt hat seine eigene
+ * Verkaufsfläche und Grundlast, damit sich Verbräuche realistisch
+ * unterscheiden — Basis für die Manager-Ansicht (V0.9) und den
+ * fairen kWh/m²-Vergleich.
+ */
+export interface StoreProfile {
+  id: string;
+  /** Anzeigename inkl. "EDEKA …" */
+  name: string;
+  /** Standort/Stadtteil */
+  city: string;
+  region: Region;
+  size: MarketSize;
+  squareMeters: number;
+  /** Durchschnittliche Grundlast in kW (skaliert die Verbrauchskurve). */
+  loadKw: number;
+  /**
+   * Salz für das deterministische Rauschen je Markt. Der eigene Markt nutzt
+   * "" → identische Zahlen wie bisher; andere Märkte erhalten ein eigenes
+   * Muster.
+   */
+  salt: string;
+  league: League;
+  rank: number;
+  rankLastWeek: number;
+  streakDays: number;
+  isOwn: boolean;
+}
+
+// Der eigene Markt — Zahlen bleiben exakt wie zuvor (loadKw = BASELINE_KW,
+// salt = "", Fläche = OWN_MARKET_SQM).
+export const OWN_STORE: StoreProfile = {
+  id: "edeka-4721",
+  name: "EDEKA Wagner",
+  city: "Hamburg-Eppendorf",
+  region: "nord",
+  size: "M",
+  squareMeters: OWN_MARKET_SQM,
+  loadKw: BASELINE_KW,
+  salt: "",
+  league: "gold",
+  rank: 7,
+  rankLastWeek: 11,
+  streakDays: 12,
+  isOwn: true,
+};
+
+/**
+ * Markt-Roster für die Manager-Ansicht (V0.9). Der eigene Markt steht an
+ * erster Stelle; die übrigen variieren in Größe, Fläche und Grundlast.
+ */
+export const STORES: StoreProfile[] = [
+  OWN_STORE,
+  {
+    id: "edeka-3185",
+    name: "EDEKA Sommer",
+    city: "München-Schwabing",
+    region: "sued",
+    size: "L",
+    squareMeters: 1860,
+    loadKw: 53,
+    salt: "sommer",
+    league: "platin",
+    rank: 3,
+    rankLastWeek: 5,
+    streakDays: 24,
+    isOwn: false,
+  },
+  {
+    id: "edeka-5602",
+    name: "EDEKA Brinkmann",
+    city: "Köln-Nippes",
+    region: "west",
+    size: "M",
+    squareMeters: 1080,
+    loadKw: 33,
+    salt: "brinkmann",
+    league: "gold",
+    rank: 21,
+    rankLastWeek: 18,
+    streakDays: 6,
+    isOwn: false,
+  },
+  {
+    id: "edeka-2940",
+    name: "EDEKA Voss",
+    city: "Berlin-Pankow",
+    region: "ost",
+    size: "XL",
+    squareMeters: 2450,
+    loadKw: 72,
+    salt: "voss",
+    league: "silber",
+    rank: 42,
+    rankLastWeek: 36,
+    streakDays: 0,
+    isOwn: false,
+  },
+  {
+    id: "edeka-7731",
+    name: "EDEKA Keller",
+    city: "Frankfurt-Bornheim",
+    region: "mitte",
+    size: "S",
+    squareMeters: 720,
+    loadKw: 22,
+    salt: "keller",
+    league: "gold",
+    rank: 14,
+    rankLastWeek: 14,
+    streakDays: 9,
+    isOwn: false,
+  },
+  {
+    id: "edeka-6118",
+    name: "EDEKA Hofmann",
+    city: "Stuttgart-Bad Cannstatt",
+    region: "sued",
+    size: "M",
+    squareMeters: 1320,
+    loadKw: 42,
+    salt: "hofmann",
+    league: "silber",
+    rank: 58,
+    rankLastWeek: 63,
+    streakDays: 3,
+    isOwn: false,
+  },
+  {
+    id: "edeka-4488",
+    name: "EDEKA Naumann",
+    city: "Leipzig-Gohlis",
+    region: "ost",
+    size: "L",
+    squareMeters: 1640,
+    loadKw: 49,
+    salt: "naumann",
+    league: "bronze",
+    rank: 96,
+    rankLastWeek: 88,
+    streakDays: 0,
+    isOwn: false,
+  },
+  {
+    id: "edeka-5377",
+    name: "EDEKA Petersen",
+    city: "Bremen-Findorff",
+    region: "nord",
+    size: "M",
+    squareMeters: 1150,
+    loadKw: 35,
+    salt: "petersen",
+    league: "gold",
+    rank: 33,
+    rankLastWeek: 29,
+    streakDays: 7,
+    isOwn: false,
+  },
+];
+
+export function getStoreById(id: string): StoreProfile {
+  return STORES.find(s => s.id === id) ?? OWN_STORE;
+}
+
+function consumptionAt(date: Date, area: SensorArea, store: StoreProfile = OWN_STORE): number {
   const hour = date.getHours();
   const minute = date.getMinutes();
   const t = hour + minute / 60;
@@ -100,15 +265,16 @@ function consumptionAt(date: Date, area: SensorArea): number {
   const profile = hourlyProfile(lo, area) * (1 - frac) + hourlyProfile(hi, area) * frac;
   const share = AREA_SHARE[area];
   const wkMult = weekdayMultiplier(date);
-  // Deterministic noise based on date+area
-  const noiseSeed = seedrandom(`${date.toISOString().slice(0, 13)}-${area}`);
+  // Deterministic noise based on store+date+area (own store keeps legacy seed)
+  const saltPrefix = store.salt ? `${store.salt}-` : "";
+  const noiseSeed = seedrandom(`${saltPrefix}${date.toISOString().slice(0, 13)}-${area}`);
   const noise = 0.9 + noiseSeed() * 0.2;
-  return BASELINE_KW * share * profile * wkMult * noise; // in kW for that minute snapshot
+  return store.loadKw * share * profile * wkMult * noise; // in kW for that minute snapshot
 }
 
 // kWh accumulated for an hour at given time
-function hourlyKWh(date: Date, area: SensorArea): number {
-  return consumptionAt(date, area); // 1 hour at avg kW = kWh
+function hourlyKWh(date: Date, area: SensorArea, store: StoreProfile = OWN_STORE): number {
+  return consumptionAt(date, area, store); // 1 hour at avg kW = kWh
 }
 
 export const AREAS: SensorArea[] = ["kuehlung", "beleuchtung", "backstation", "heizung", "klima", "sonstiges"];
@@ -117,11 +283,13 @@ export interface ReadingsQuery {
   range: "day" | "week" | "month" | "year";
   areas?: SensorArea[];
   reference?: Date; // end date, defaults to DEMO_NOW
+  store?: StoreProfile; // defaults to the own market
 }
 
 export function getReadings(q: ReadingsQuery): EnergyReading[] {
   const ref = q.reference ?? DEMO_NOW;
   const areas = q.areas && q.areas.length > 0 ? q.areas : AREAS;
+  const store = q.store ?? OWN_STORE;
   const result: EnergyReading[] = [];
 
   if (q.range === "day") {
@@ -131,7 +299,7 @@ export function getReadings(q: ReadingsQuery): EnergyReading[] {
     for (let h = 0; h < 24; h++) {
       const ts = new Date(start);
       ts.setHours(h);
-      const total = areas.reduce((sum, a) => sum + hourlyKWh(ts, a), 0);
+      const total = areas.reduce((sum, a) => sum + hourlyKWh(ts, a, store), 0);
       result.push({ timestamp: ts, kWh: total, area: "sonstiges" });
     }
   } else if (q.range === "week") {
@@ -144,7 +312,7 @@ export function getReadings(q: ReadingsQuery): EnergyReading[] {
       for (let h = 0; h < 24; h++) {
         const ts = new Date(day);
         ts.setHours(h);
-        total += areas.reduce((sum, a) => sum + hourlyKWh(ts, a), 0);
+        total += areas.reduce((sum, a) => sum + hourlyKWh(ts, a, store), 0);
       }
       result.push({ timestamp: day, kWh: total, area: "sonstiges" });
     }
@@ -158,7 +326,7 @@ export function getReadings(q: ReadingsQuery): EnergyReading[] {
       for (let h = 0; h < 24; h++) {
         const ts = new Date(day);
         ts.setHours(h);
-        total += areas.reduce((sum, a) => sum + hourlyKWh(ts, a), 0);
+        total += areas.reduce((sum, a) => sum + hourlyKWh(ts, a, store), 0);
       }
       // gentle downward trend over the month — story of improvement
       const trend = 1 + (i / 30) * 0.12;
@@ -175,7 +343,7 @@ export function getReadings(q: ReadingsQuery): EnergyReading[] {
       for (let h = 0; h < 24; h++) {
         const ts = new Date(day);
         ts.setHours(h);
-        total += areas.reduce((sum, a) => sum + hourlyKWh(ts, a), 0);
+        total += areas.reduce((sum, a) => sum + hourlyKWh(ts, a, store), 0);
       }
       const monthFactor = 28 + (day.getMonth() >= 4 && day.getMonth() <= 8 ? 4 : 0); // summer slightly higher
       // seasonal modulation
@@ -187,7 +355,10 @@ export function getReadings(q: ReadingsQuery): EnergyReading[] {
 }
 
 // Per-area breakdown for today
-export function getAreaBreakdown(reference: Date = DEMO_NOW): { area: SensorArea; kWh: number }[] {
+export function getAreaBreakdown(
+  store: StoreProfile = OWN_STORE,
+  reference: Date = DEMO_NOW,
+): { area: SensorArea; kWh: number }[] {
   const start = new Date(reference);
   start.setHours(0, 0, 0, 0);
   return AREAS.map(area => {
@@ -195,7 +366,7 @@ export function getAreaBreakdown(reference: Date = DEMO_NOW): { area: SensorArea
     for (let h = 0; h < 24; h++) {
       const ts = new Date(start);
       ts.setHours(h);
-      total += hourlyKWh(ts, area);
+      total += hourlyKWh(ts, area, store);
     }
     return { area, kWh: total };
   });
@@ -224,9 +395,9 @@ export function getHeatmap(): number[][] {
   return grid;
 }
 
-// Build current snapshot
-export function getCurrentMarketSnapshot(): MarketSnapshot {
-  const todayReadings = getReadings({ range: "day" });
+// Build current snapshot for a given market (defaults to the own market).
+export function getCurrentMarketSnapshot(store: StoreProfile = OWN_STORE): MarketSnapshot {
+  const todayReadings = getReadings({ range: "day", store });
   // sum of hours up to current
   const hourNow = DEMO_NOW.getHours();
   const todayKWh = todayReadings.slice(0, hourNow + 1).reduce((s, r) => s + r.kWh, 0);
@@ -234,27 +405,27 @@ export function getCurrentMarketSnapshot(): MarketSnapshot {
   const yesterday = new Date(DEMO_NOW);
   yesterday.setDate(yesterday.getDate() - 1);
   yesterday.setHours(23, 59, 0, 0);
-  const ydReadings = getReadings({ range: "day", reference: yesterday });
+  const ydReadings = getReadings({ range: "day", reference: yesterday, store });
   const yesterdayKWh = ydReadings.slice(0, hourNow + 1).reduce((s, r) => s + r.kWh, 0);
 
-  const weekReadings = getReadings({ range: "week" });
+  const weekReadings = getReadings({ range: "week", store });
   const weekKWh = weekReadings.reduce((s, r) => s + r.kWh, 0);
 
   const lastWeekRef = new Date(DEMO_NOW);
   lastWeekRef.setDate(lastWeekRef.getDate() - 7);
-  const lastWeekReadings = getReadings({ range: "week", reference: lastWeekRef });
+  const lastWeekReadings = getReadings({ range: "week", reference: lastWeekRef, store });
   const lastWeekKWh = lastWeekReadings.reduce((s, r) => s + r.kWh, 0);
 
-  const monthReadings = getReadings({ range: "month" });
+  const monthReadings = getReadings({ range: "month", store });
   const monthKWh = monthReadings.reduce((s, r) => s + r.kWh, 0);
 
   const lastMonthRef = new Date(DEMO_NOW);
   lastMonthRef.setDate(lastMonthRef.getDate() - 30);
-  const lastMonthReadings = getReadings({ range: "month", reference: lastMonthRef });
+  const lastMonthReadings = getReadings({ range: "month", reference: lastMonthRef, store });
   const lastMonthKWh = lastMonthReadings.reduce((s, r) => s + r.kWh, 0);
 
   // Current live kW
-  const currentLoadKw = AREAS.reduce((s, a) => s + consumptionAt(DEMO_NOW, a), 0);
+  const currentLoadKw = AREAS.reduce((s, a) => s + consumptionAt(DEMO_NOW, a, store), 0);
 
   // CO2 ratio: 0.36 kg/kWh (German mix), savings vs avg
   const expectedKWh = weekKWh * 1.12; // assume 12% above without this market
@@ -262,16 +433,16 @@ export function getCurrentMarketSnapshot(): MarketSnapshot {
   const costSavedEuro = Math.max(0, (expectedKWh - weekKWh) * 0.32);
 
   return {
-    id: "edeka-4721",
-    displayName: "EDEKA Wagner · Hamburg-Eppendorf",
-    region: "nord",
-    size: "M",
-    squareMeters: OWN_MARKET_SQM,
-    league: "gold",
-    rank: 7,
+    id: store.id,
+    displayName: `${store.name} · ${store.city}`,
+    region: store.region,
+    size: store.size,
+    squareMeters: store.squareMeters,
+    league: store.league,
+    rank: store.rank,
     totalMarkets: 247,
-    rankLastWeek: 11,
-    streakDays: 12,
+    rankLastWeek: store.rankLastWeek,
+    streakDays: store.streakDays,
     updatedAtMinutesAgo: 3,
     kpis: {
       todayKWh,

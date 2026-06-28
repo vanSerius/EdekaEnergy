@@ -8,7 +8,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import { OWN_MARKET_SQM } from "@/lib/mockData";
+import { OWN_STORE } from "@/lib/mockData";
+import { useStore } from "@/lib/store/context";
 import { formatkWh, formatIntensity } from "@/lib/formatters";
 
 /**
@@ -39,13 +40,14 @@ const UnitContext = createContext<UnitContextValue>({
   mode: "total",
   setMode: () => {},
   isIntensity: false,
-  sqm: OWN_MARKET_SQM,
+  sqm: OWN_STORE.squareMeters,
   convert: kWh => kWh,
   unitLabel: "kWh",
   format: (kWh, opts) => formatkWh(kWh, opts),
 });
 
 export function UnitProvider({ children }: { children: React.ReactNode }) {
+  const { activeStore } = useStore();
   const [mode, setModeState] = useState<UnitMode>("total");
 
   // Aus localStorage hydratisieren (nur Client)
@@ -65,7 +67,7 @@ export function UnitProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<UnitContextValue>(() => {
     const isIntensity = mode === "intensity";
-    const sqm = OWN_MARKET_SQM;
+    const sqm = activeStore.squareMeters;
     return {
       mode,
       setMode,
@@ -76,7 +78,7 @@ export function UnitProvider({ children }: { children: React.ReactNode }) {
       format: (kWh, opts) =>
         isIntensity ? formatIntensity(kWh / sqm, opts) : formatkWh(kWh, opts),
     };
-  }, [mode, setMode]);
+  }, [mode, setMode, activeStore.squareMeters]);
 
   return <UnitContext.Provider value={value}>{children}</UnitContext.Provider>;
 }

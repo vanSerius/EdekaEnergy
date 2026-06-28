@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { LanguageProvider } from "@/lib/i18n/context";
+import { StoreProvider } from "@/lib/store/context";
 import { UnitProvider } from "@/lib/units/context";
 import "./globals.css";
 
@@ -56,7 +57,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="de" className={`${display.variable} ${body.variable} ${mono.variable} ${serif.variable}`}>
       <body>
         <LanguageProvider>
-          <UnitProvider>{children}</UnitProvider>
+          <StoreProvider>
+            <UnitProvider>{children}</UnitProvider>
+          </StoreProvider>
         </LanguageProvider>
       </body>
     </html>

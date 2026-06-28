@@ -6,13 +6,15 @@ import { SENSOR_AREAS } from "@/types/energy";
 import { formatPercent } from "@/lib/formatters";
 import { useT } from "@/lib/i18n/context";
 import { useUnit } from "@/lib/units/context";
+import { useStore } from "@/lib/store/context";
 
 const COLORS = ["#001A4D", "#FFD500", "#003D8F", "#1F9E63", "#D9531E", "#8089A0"];
 
 export function AreaBreakdown() {
   const t = useT();
   const { isIntensity, format } = useUnit();
-  const breakdown = getAreaBreakdown();
+  const { activeStore } = useStore();
+  const breakdown = getAreaBreakdown(activeStore);
   const total = breakdown.reduce((s, b) => s + b.kWh, 0);
   const sorted = [...breakdown].sort((a, b) => b.kWh - a.kWh);
 

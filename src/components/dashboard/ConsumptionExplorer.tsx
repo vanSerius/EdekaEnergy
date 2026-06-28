@@ -11,6 +11,7 @@ import { weekdayShort, formatkWh, formatIntensity, formatPercent, monthShort } f
 import type { SensorArea } from "@/types/energy";
 import { useT, useLang } from "@/lib/i18n/context";
 import { useUnit } from "@/lib/units/context";
+import { useStore } from "@/lib/store/context";
 
 /**
  * Eigenständige Verbrauchsverteilung (aus dem Verlauf-Screen): Zeitraum-Tabs,
@@ -21,18 +22,19 @@ export function ConsumptionExplorer() {
   const t = useT();
   const { lang } = useLang();
   const { isIntensity, convert, unitLabel } = useUnit();
+  const { activeStore } = useStore();
   const [range, setRange] = useState<Range>("week");
   const [areas, setAreas] = useState<SensorArea[]>([]);
 
   const data: ChartPoint[] = useMemo(() => {
     const sel = areas.length === 0 ? undefined : areas;
-    const current = getReadings({ range, areas: sel });
+    const current = getReadings({ range, areas: sel, store: activeStore });
     const prevRef = new Date(DEMO_NOW);
     if (range === "day") prevRef.setDate(prevRef.getDate() - 1);
     else if (range === "week") prevRef.setDate(prevRef.getDate() - 7);
     else if (range === "month") prevRef.setDate(prevRef.getDate() - 30);
     else prevRef.setFullYear(prevRef.getFullYear() - 1);
-    const previous = getReadings({ range, areas: sel, reference: prevRef });
+    const previous = getReadings({ range, areas: sel, reference: prevRef, store: activeStore });
     return current.map((p, i) => {
       const labelDate = p.timestamp;
       const label =
@@ -50,7 +52,7 @@ export function ConsumptionExplorer() {
         previous: prev === undefined ? undefined : convert(prev),
       };
     });
-  }, [range, areas, lang, isIntensity, convert]);
+  }, [range, areas, lang, isIntensity, convert, activeStore]);
 
   const totals = useMemo(() => {
     const sumCurrent = data.reduce((s, p) => s + p.current, 0);

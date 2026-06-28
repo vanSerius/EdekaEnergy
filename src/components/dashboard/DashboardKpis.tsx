@@ -6,6 +6,7 @@ import { getCurrentMarketSnapshot } from "@/lib/mockData";
 import { formatkWh, formatEuro, formatKg } from "@/lib/formatters";
 import { useT } from "@/lib/i18n/context";
 import { useUnit } from "@/lib/units/context";
+import { useStore } from "@/lib/store/context";
 
 /**
  * "Die Zahlen, kurz & knackig" — Überschrift + die vier Kern-KPIs.
@@ -14,7 +15,8 @@ import { useUnit } from "@/lib/units/context";
 export function DashboardKpis() {
   const t = useT();
   const { isIntensity, format, unitLabel } = useUnit();
-  const m = getCurrentMarketSnapshot();
+  const { activeStore } = useStore();
+  const m = getCurrentMarketSnapshot(activeStore);
 
   const dayDelta =
     ((m.kpis.todayKWh - m.kpis.yesterdayKWh) / m.kpis.yesterdayKWh) * 100;

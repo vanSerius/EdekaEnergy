@@ -3,27 +3,48 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { ArrowRight, LayoutDashboard, Trophy } from "lucide-react";
+import { ArrowRight, LayoutDashboard, Store, Trophy } from "lucide-react";
 import { EdekaMark } from "@/components/brand/EdekaMark";
 import { LanguageSwitcher } from "@/components/shell/LanguageSwitcher";
 import { VersionOneScreen } from "@/components/v1/VersionOneScreen";
+import { AdminScreen } from "@/components/v09/AdminScreen";
 import { useT } from "@/lib/i18n/context";
 import { useUnit } from "@/lib/units/context";
+import { useStore } from "@/lib/store/context";
 
 export default function LandingPage() {
   const t = useT();
   const { setMode } = useUnit();
+  const { resetToOwn } = useStore();
   // Bewusst NICHT persistiert: ein Reload (F5) führt immer zurück zur Auswahl.
-  const [version, setVersion] = useState<null | "v1">(null);
+  const [version, setVersion] = useState<null | "v09" | "v1">(null);
+
+  const backToSelection = () => {
+    resetToOwn();
+    setMode("total");
+    setVersion(null);
+  };
+
+  if (version === "v09") {
+    return <AdminScreen onBack={backToSelection} />;
+  }
 
   if (version === "v1") {
-    return <VersionOneScreen onBack={() => setVersion(null)} />;
+    return <VersionOneScreen onBack={backToSelection} />;
   }
 
   const openV1 = () => {
-    // V1 ist die Basis-Version → immer in absoluten kWh zeigen.
+    // V1 ist die Basis-Version → eigener Markt, immer in absoluten kWh.
+    resetToOwn();
     setMode("total");
     setVersion("v1");
+  };
+
+  const openV09 = () => {
+    // V0.9 ist die Manager-Ansicht → Start beim eigenen Markt.
+    resetToOwn();
+    setMode("total");
+    setVersion("v09");
   };
 
   return (
@@ -55,7 +76,37 @@ export default function LandingPage() {
             </p>
           </motion.div>
 
-          <div className="mt-12 grid gap-5 sm:grid-cols-2">
+          {/* Version 0.9 — Manager-Ansicht (Pilot, nur Auftraggeber) */}
+          <motion.button
+            type="button"
+            onClick={openV09}
+            initial={{ y: 24, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.04, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ y: -4 }}
+            className="block-navy group relative mt-12 block w-full cursor-pointer overflow-hidden p-7 text-left sm:p-9"
+          >
+            <div className="flex items-center justify-between">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-edeka-yellow text-edeka-blue-deep">
+                <Store className="h-5 w-5" strokeWidth={2} />
+              </span>
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-edeka-yellow">
+                {t.landing.v09_tag}
+              </span>
+            </div>
+            <h2 className="mt-6 font-display text-2xl font-semibold tracking-tight text-paper sm:text-3xl">
+              {t.landing.v09_title}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-paper/75">
+              {t.landing.v09_desc}
+            </p>
+            <span className="mt-6 inline-flex items-center gap-1.5 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-edeka-yellow">
+              {t.landing.v09_cta}
+              <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-1" />
+            </span>
+          </motion.button>
+
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
             {/* Version 1 — Basis */}
             <motion.button
               type="button"
