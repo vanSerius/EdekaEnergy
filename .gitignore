@@ -15,3 +15,6 @@ promo/
 # Python cache
 __pycache__/
 *.pyc
+
+# Generated presentation deliverables (sent to user, not project source)
+*.pptx
